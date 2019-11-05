@@ -205,7 +205,7 @@ function encrypt(db, keyOrPromise, cryptoSettings, nonceOverride) {
                                 return;
                             }
                             table.hook('creating', function(primKey, obj) {
-                                const preservedValue = { ...obj };
+                                const preservedValue = Object.assign({}, obj );
                                 encryptWithRule(table, obj, newSetting);
                                 this.onsuccess = () => {
                                     delete obj.__encryptedData;
@@ -217,11 +217,8 @@ function encrypt(db, keyOrPromise, cryptoSettings, nonceOverride) {
                                 };
                             });
                             table.hook('updating', function(modifications, primKey, obj) {
-                                const decrypted = decryptWithRule({ ...obj }, newSetting);
-                                const updates = {
-                                    ...decrypted,
-                                    ...modifications,
-                                };
+                                const decrypted = decryptWithRule(Object.assign({}, obj ), newSetting);
+                                const updates = Object.assign({}, decrypted, modifications );
                                 const encrypted = encryptWithRule(table, updates, newSetting);
                                 return encrypted;
                             });
